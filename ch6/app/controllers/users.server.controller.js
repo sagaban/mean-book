@@ -68,3 +68,39 @@ exports.signout = function (req, res) {
     req.logout();
     res.redirect('/');
 };
+
+exports.saveOAuthUserProfile = function (req, profile, done) {
+    User.findOne({
+        provider: profile.provider,
+        providerId: profile.providerId
+    }, function (err, user) {
+        if (err) {
+            return done(err);
+        } else {
+            if (!user) {
+                // TODO: the username and email could not be returned and should be handled
+                var possibleUsername = profile.username ||
+                    ((profile.email) ? profile.email.split('@')[0] : '') ||
+                    'santiagobandiera';
+                User.findUniqueUsername(possibleUsername, null,
+                    function (availableUsername) {
+                        profile.username = availableUsername;
+                        user = new User(profile);
+                        user.save(function (err) {
+                            if (err) {
+                                // TODO:  The followin code that handle the error does not work
+                                console.log(err);
+                                var message = err.message;
+                                req.flash('error', message);
+                                //return res.redirect('/signup');
+                                return done(err, null);
+                            }
+                            return done(err, user);
+                        });
+                    });
+            } else {
+                return done(err, user);
+            }
+        }
+    });
+};
