@@ -69,36 +69,39 @@ exports.signout = function (req, res) {
     res.redirect('/');
 };
 
+// Create a new controller method that creates new 'OAuth' users
 exports.saveOAuthUserProfile = function (req, profile, done) {
+    // Try finding a user document that was registered using the current OAuth provider
     User.findOne({
         provider: profile.provider,
         providerId: profile.providerId
     }, function (err, user) {
+        // If an error occurs continue to the next middleware
         if (err) {
             return done(err);
         } else {
+            // If a user could not be found, create a new user, otherwise, continue to the next middleware
             if (!user) {
-                // TODO: the username and email could not be returned and should be handled
-                var possibleUsername = profile.username ||
-                    ((profile.email) ? profile.email.split('@')[0] : '') ||
-                    'santiagobandiera';
-                User.findUniqueUsername(possibleUsername, null,
-                    function (availableUsername) {
-                        profile.username = availableUsername;
-                        user = new User(profile);
-                        user.save(function (err) {
-                            if (err) {
-                                // TODO:  The followin code that handle the error does not work
-                                console.log(err);
-                                var message = err.message;
-                                req.flash('error', message);
-                                //return res.redirect('/signup');
-                                return done(err, null);
-                            }
-                            return done(err, user);
-                        });
+                // Set a possible base username
+                // TODO: It's possible that facebook do not return a valid username or email: HARCODED 'santiago'
+                var possibleUsername = profile.username || ((profile.email) ? profile.email.split('@')[0] : 'santiago');
+                console.log('possibleUsername', possibleUsername);
+                // Find a unique available username
+                User.findUniqueUsername(possibleUsername, null, function (availableUsername) {
+                    // Set the available user name
+                    profile.username = availableUsername;
+
+                    // Create the user
+                    user = new User(profile);
+
+                    // Try saving the new user document
+                    user.save(function (err) {
+                        // Continue to the next middleware
+                        return done(err, user);
                     });
+                });
             } else {
+                // Continue to the next middleware
                 return done(err, user);
             }
         }
