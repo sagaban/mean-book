@@ -9,6 +9,7 @@
 /node/**
 /node_modules/**
 **/node_modules/**
+**/public/lib
 
 ######################
 # SASS
@@ -104,6 +105,7 @@ Desktop.ini
 /bin/**
 /spring_loaded/**
 /deploy/**
+
 
 ######################
 # Logs
