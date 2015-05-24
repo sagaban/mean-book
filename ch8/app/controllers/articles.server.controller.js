@@ -1,8 +1,15 @@
-var getErrorMessage = function (err) {
+// Invoke 'strict' JavaScript mode
+'use strict';
+
+// Load the module dependencies
+var mongoose = require('mongoose'),
+    Article = mongoose.model('Article');
+
+// Create a new error handling controller method
+var getErrorMessage = function(err) {
     if (err.errors) {
         for (var errName in err.errors) {
-            if (err.errors[errName].message) return err.errors[errName].
-                message;
+            if (err.errors[errName].message) return err.errors[errName].message;
         }
     } else {
         return 'Unknown server error';
