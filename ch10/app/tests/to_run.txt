@@ -1,0 +1,2 @@
+go to the root app folder and then:
+$ NODE_ENV=test mocha --reporter spec app/tests
