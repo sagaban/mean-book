@@ -1,0 +1,2 @@
+#from the root folder, run
+$ node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update
